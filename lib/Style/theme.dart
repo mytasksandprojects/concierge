@@ -45,7 +45,7 @@ class AppTheme {
           surface: CustomColors.mainBlack,
           onSurface: CustomColors.mainBlack),*/
 
-      backgroundColor: CustomColors.mainColor,
+     // backgroundColor: CustomColors.mainColor,
       hoverColor: Color(0xff4D4D4D),
       appBarTheme: AppBarTheme(
         //  backgroundColor: CustomColors.appBarBackGround,

@@ -20,10 +20,13 @@ class _HomeView extends HookView<HomeViewModel> {
 
   @override
   Widget render(context, vmodel) {
-    return ListView(
-      children: const <Widget>[
-        Text('Home')
-       ],
+    return Container(
+      color: Color(0xff4A4B4D).withOpacity(0.11),
+      child: ListView(
+        children: const <Widget>[
+          Text('Home')
+         ],
+      ),
     );
   }
 }

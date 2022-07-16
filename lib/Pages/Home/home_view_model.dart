@@ -7,7 +7,7 @@ class HomeViewModel extends ViewModel {
 
   @override
   void init() {
-    var height = MediaQuery.of(context).size.height;
+
     super.init();
   }
 }

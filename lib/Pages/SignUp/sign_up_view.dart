@@ -1,6 +1,8 @@
 import 'package:concierge/Style/custom_colors.dart';
 import 'package:concierge/Style/custom_icons.dart';
+import 'package:concierge/Widgets/rolling_date_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pmvvm/pmvvm.dart';
 
 import 'sign_up_view_model.dart';
@@ -68,6 +70,7 @@ class _SignUpView extends HookView<SignUpViewModel> {
                     height: 20,
                   ),
                   TextFormField(
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         CustomIcons.your_name,
@@ -87,6 +90,7 @@ class _SignUpView extends HookView<SignUpViewModel> {
                     height: 20,
                   ),
                   TextFormField(
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         Icons.person,
@@ -106,8 +110,34 @@ class _SignUpView extends HookView<SignUpViewModel> {
                     height: 20,
                   ),
                   TextFormField(
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    style: TextStyle(color: Colors.black),
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      prefixStyle: TextStyle(color: Colors.grey),
+                      prefixIcon: Icon(
+                        Icons.phone_android,
+                        color: Colors.grey,
+                      ),
+                      hintText: 'Mobile',
+                      hintStyle: TextStyle(color: Colors.grey),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
                     obscureText: true,
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         CustomIcons.lock,
@@ -132,7 +162,7 @@ class _SignUpView extends HookView<SignUpViewModel> {
                   ),
                   TextFormField(
                     obscureText: true,
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         CustomIcons.lock,
@@ -156,10 +186,11 @@ class _SignUpView extends HookView<SignUpViewModel> {
                     height: 20,
                   ),
                   TextFormField(
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.safety_check,
-                        color: Colors.grey,
+                      prefixIcon: Image.asset(
+                        'assets/images/shield.png',
+                        fit: BoxFit.none,
                       ),
                       hintText: 'Confirmation Code',
                       hintStyle: TextStyle(color: Colors.grey),
@@ -171,6 +202,18 @@ class _SignUpView extends HookView<SignUpViewModel> {
                       ),
                     ),
                   ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'Birth of date',
+                        style: TextStyle(color: Colors.grey, fontSize: 24),
+                      ),
+                    ],
+                  ),
+                  RollingDatePicker(signUpViewModel: vmodel),
                   SizedBox(
                     height: 20,
                   ),

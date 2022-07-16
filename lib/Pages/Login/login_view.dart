@@ -1,7 +1,9 @@
 import 'package:concierge/Configuration/PageRouteName.dart';
+import 'package:concierge/Configuration/validtor.dart';
 import 'package:concierge/Style/custom_colors.dart';
 import 'package:concierge/Style/custom_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:pmvvm/pmvvm.dart';
 
 import 'login_view_model.dart';
@@ -69,6 +71,18 @@ class _LoginView extends HookView<LoginViewModel> {
                     height: 20,
                   ),
                   TextFormField(
+                    key: vmodel.emailKey,
+                    validator: (val) {
+                      if (AppValidator.isEmail(val)) {
+                        return null;
+                      }
+                      return 'enter valid email';
+                    },
+                    onSaved: (val) {
+                      vmodel.email = val;
+                    },
+                    controller: vmodel.emailController,
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         Icons.person,
@@ -88,8 +102,19 @@ class _LoginView extends HookView<LoginViewModel> {
                     height: 20,
                   ),
                   TextFormField(
-                    obscureText: true,
-                    style: TextStyle(color: Colors.grey),
+                    key: vmodel.passwordKey,
+                    validator: (val) {
+                      if (AppValidator.isPassword(val)) {
+                        return null;
+                      }
+                      return 'enter valid password';
+                    },
+                    onSaved: (val) {
+                      vmodel.password = val;
+                    },
+                    controller: vmodel.passwordController,
+                    obscureText: vmodel.secureText,
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         CustomIcons.lock,
@@ -100,7 +125,9 @@ class _LoginView extends HookView<LoginViewModel> {
                       hintStyle: TextStyle(color: Colors.grey),
                       suffixIcon: GestureDetector(
                           child: Icon(Icons.remove_red_eye, color: Colors.grey),
-                          onTap: () {}),
+                          onTap: () {
+                            vmodel.secureText = !vmodel.secureText;
+                          }),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey),
                       ),
@@ -130,22 +157,41 @@ class _LoginView extends HookView<LoginViewModel> {
                   SizedBox(
                     height: 20,
                   ),
-                  Container(
-                      height: 60,
-                      width: MediaQuery.of(context).size.width / 1.2,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        gradient: CustomColors.mainGradient,
-                      ),
-                      child: Center(
-                        child: Text(
-                          'LOGIN',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
+                  GestureDetector(
+                    onTap: () {
+                      if (vmodel.emailKey.currentState!.validate() &&
+                          vmodel.passwordKey.currentState!.validate()) {
+                        vmodel.emailKey.currentState!.save();
+                        vmodel.passwordKey.currentState!.save();
+                        EasyLoading.show();
+                        vmodel.login().then((value) {
+                          debugPrint('login bool value from login view model');
+                          debugPrint(value.toString());
+                          if(value){
+                            //navigate to home
+                          }else {
+                            //error in login request
+                          }
+                        }).whenComplete(() => EasyLoading.dismiss());
+                      }
+                    },
+                    child: Container(
+                        height: 60,
+                        width: MediaQuery.of(context).size.width / 1.2,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: CustomColors.mainGradient,
                         ),
-                      )),
+                        child: Center(
+                          child: Text(
+                            'LOGIN',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        )),
+                  ),
                   SizedBox(
                     height: 30,
                   ),

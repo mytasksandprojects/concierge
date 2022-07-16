@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 //import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
@@ -22,8 +23,10 @@ class WebService {
   final String _giftRayBaseURL="";
   late Dio freeDio;
   late Dio tokenDio;
-  String storageKeyClientToken = "access_token";
+  String storageKeyToken = "access_token";
+  String storageRefreshKeyToken = "refresh_token";
   String? myToken;
+  String? refreshToken;
   String? lang;
   String? deviceId;
   String? platform;
@@ -57,7 +60,12 @@ class WebService {
   Future<String?> getToken() async {
     final SharedPreferences prefs = await _prefs;
 
-    return prefs.getString(storageKeyClientToken);
+    return prefs.getString(storageKeyToken);
+  }
+  Future<String?> getRefreshToken() async {
+    final SharedPreferences prefs = await _prefs;
+
+    return prefs.getString(storageRefreshKeyToken);
   }
   /// ----------------------------------------------------------
   /// Method that saves the token in Shared Preferences
@@ -68,7 +76,15 @@ class WebService {
 
     final SharedPreferences prefs = await _prefs;
 
-    return prefs.setString(storageKeyClientToken, token);
+    return prefs.setString(storageKeyToken, token);
+  }
+
+  Future<bool> setRefreshToken(String token) async {
+    refreshToken = token;
+
+    final SharedPreferences prefs = await _prefs;
+
+    return prefs.setString(storageRefreshKeyToken, token);
   }
 
   /// ----------------------------------------------------------
@@ -88,7 +104,7 @@ class WebService {
     } catch (errror) {
       fcmToken = null;
     }
-    print(fcmToken);
+    debugPrint(fcmToken);
     return;
   }*/
 
@@ -130,24 +146,24 @@ class WebService {
     freeDio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          print('send request ${options.uri}');
-          print('headers: ${options.headers}');
-          print('query parameters: ${options.queryParameters}');
-          print('data: ${options.data}');
-          print(
+          debugPrint('send request ${options.uri}');
+          debugPrint('headers: ${options.headers}');
+          debugPrint('query parameters: ${options.queryParameters}');
+          debugPrint('data: ${options.data}');
+          debugPrint(
               'authorization header: ${options.headers[HttpHeaders.authorizationHeader]}');
           return handler.next(options); //continue
         },
         onResponse: (response, handler) async {
           // Do something with response data
-          print(response.data);
+          debugPrint(response.data.toString());
           return handler.next(response); // continue
         },
         onError: (DioError e, handler) async {
-          print('path: ${e.requestOptions.path}');
-          print('response: ${e.response}');
-          print('statusCode: ${e.response?.statusCode}');
-          print('data: ${e.response?.data}');
+          debugPrint('path: ${e.requestOptions.path}');
+          debugPrint('response: ${e.response}');
+          debugPrint('statusCode: ${e.response?.statusCode}');
+          debugPrint('data: ${e.response?.data}');
           EasyLoading.dismiss();
 
           if (e.response != null) {
@@ -157,11 +173,11 @@ class WebService {
                 ToastService.showErrorToast(e.response?.data['message']);
               return handler.next(e);
             } else if (e.requestOptions.path == "api/login") {
-              print("here");
+              debugPrint("here");
               return handler.next(e);
             } else {
               ToastService.showUnExpectedErrorToast();
-              ToastService.showErrorToast(e.response!.data['errors']
+              ToastService.showErrorToast(e.response!.data['non_field_errors']
                   .toString()
                   .replaceAll('[', ' ')
                   .replaceAll(']', ' ')
@@ -182,23 +198,23 @@ class WebService {
           options.headers['Authorization'] = "Bearer " + myToken!;
           options.responseType = ResponseType.json;
         //  options.headers.addAll({'locale': this.lang});
-          print('send request ${options.uri}');
-          print('headers: ${options.headers}');
-          print('query parameters: ${options.queryParameters}');
+          debugPrint('send request ${options.uri}');
+          debugPrint('headers: ${options.headers}');
+          debugPrint('query parameters: ${options.queryParameters}');
           return handler.next(options); //continue
         },
         onResponse: (response, handler) async {
           await EasyLoading.dismiss();
           // Do something with response data
-          print(response.data);
+          debugPrint(response.data.toString());
           return handler.next(response); // continue
         },
         onError: (DioError e, handler) async {
           EasyLoading.dismiss();
-          print('path: ${e.requestOptions.path}');
-          print('response: ${e.response}');
-          print('statusCode: ${e.response?.statusCode}');
-          print('data: ${e.response?.data}');
+          debugPrint('path: ${e.requestOptions.path}');
+          debugPrint('response: ${e.response}');
+          debugPrint('statusCode: ${e.response?.statusCode}');
+          debugPrint('data: ${e.response?.data}');
 
           if (e.response != null) {
             if (e.response!.statusCode == 401) {
@@ -213,13 +229,13 @@ class WebService {
                   e.response!.data['message'].toString());
             } else {
               EasyLoading.dismiss();
-              print("unExpected");
+              debugPrint("unExpected");
               ToastService.showUnExpectedErrorToast();
             }
           } else {
             EasyLoading.dismiss();
 
-            print("No Connection");
+            debugPrint("No Connection");
             ToastService.showErrorToast("no internet connection");
           }
         },

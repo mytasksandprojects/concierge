@@ -38,6 +38,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   fluttertoast: ^8.0.9
   flutter_easyloading: ^3.0.5
+  animated_bottom_navigation_bar: ^1.0.1
+  auto_size_text: ^3.0.0
+  circular_reveal_animation: ^2.0.1
+  scroll_date_picker: ^3.4.0
+  intl: ^0.17.0
 
   #device
   device_info_plus: ^3.2.0

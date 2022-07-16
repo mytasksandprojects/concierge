@@ -1,8 +1,12 @@
 import 'package:concierge/Configuration/PageRouteName.dart';
+import 'package:concierge/Pages/Home/home_view.dart';
 import 'package:concierge/Pages/splashScreen/splash_screen_service.dart';
+import 'package:concierge/Widgets/bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:pmvvm/pmvvm.dart';
 import 'package:easy_localization/easy_localization.dart';
+
+import '../Home/home_view_model.dart';
 
 class SplashScreenViewModel extends ViewModel {
   final SplashScreenService _splashScreenService = SplashScreenService();
@@ -12,7 +16,14 @@ class SplashScreenViewModel extends ViewModel {
     Future.delayed(const Duration(seconds: 3)).then((value) {
       //here we will check language state.
       _splashScreenService.initializeInterceptors();
+
       Navigator.of(context).pushNamed(PageRouteName.login);
+/*     Navigator.of(context).push(MaterialPageRoute(builder: (context) => BottomBar(views: [
+       ChangeNotifierProvider(create: (context) => HomeViewModel(),child: Home(),),
+       Container(),
+       Container(),
+       Container(),
+     ]),));*/
     });
     super.init();
   }
