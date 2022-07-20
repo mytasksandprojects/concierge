@@ -99,7 +99,7 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
             _bottomNavIndex], //NavigationScreen(iconList[_bottomNavIndex]),
       ),
       floatingActionButton: FloatingActionButton(
-        clipBehavior: Clip.none,
+        //clipBehavior: Clip.none,
         backgroundColor: Colors.black,
         elevation: 0.0,
         child: Container(
@@ -109,7 +109,10 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
             ),
             child: Stack(
               children: [
-                Center(child: Icon(CustomIcons.path_142, size: 25)),
+                Positioned(
+                    right: MediaQuery.of(context).size.width / 9.5,
+                    top: 5,
+                    child: Center(child: Icon(CustomIcons.path_142, size: 30))),
                 Center(child: Text('ASK')),
               ],
             )),
@@ -130,7 +133,7 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                CustomIcons.component_118___1, //notifications icon
+                CustomIcons.notificationsTab, //notifications icon
                 size: 24,
                 color: color,
               ),
@@ -149,7 +152,7 @@ class _BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
         },
         backgroundColor: Colors.black,
         activeIndex: _bottomNavIndex,
-        splashColor: HexColor('#4A4B4D'),
+        splashColor: CustomColors.mainColor,
         notchAndCornersAnimation: borderRadiusAnimation,
         splashSpeedInMilliseconds: 300,
         notchSmoothness: NotchSmoothness.defaultEdge,

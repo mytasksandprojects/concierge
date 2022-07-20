@@ -8,4 +8,11 @@ class SplashScreenService {
     //initial dio
     _webService.initializeInterceptors();
   }
+  Future<String?>getLang(){
+    return _webService.getCurrentLang();
+  }
+  Future<String?>getToken(){
+    return _webService.getToken();
+  }
+
 }

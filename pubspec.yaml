@@ -43,6 +43,7 @@ dependencies:
   circular_reveal_animation: ^2.0.1
   scroll_date_picker: ^3.4.0
   intl: ^0.17.0
+  carousel_indicator: ^1.0.6
 
   #device
   device_info_plus: ^3.2.0
@@ -106,3 +107,6 @@ flutter:
     - family: Login
       fonts:
         - asset: assets/fonts/Login.ttf
+    - family: Home
+      fonts:
+        - asset: assets/fonts/Home.ttf

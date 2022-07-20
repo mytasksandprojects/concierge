@@ -13,51 +13,32 @@ class SplashScreenViewModel extends ViewModel {
 
   @override
   void init() {
+    //initialize interceptors
+    _splashScreenService.initializeInterceptors();
     Future.delayed(const Duration(seconds: 3)).then((value) {
-      //here we will check language state.
-      _splashScreenService.initializeInterceptors();
+      //first we will check language state if lang set in mobile storage set language if not navigate to choose lang screen.
+      //and second we will check token to navigate user to home page if tokens exists in mobile storage otherwise navigate to login.
+      _splashScreenService.getLang().then((valueLang) {
+        if(valueLang!=null){
+          //set language
+          //check token
+          _splashScreenService.getToken().then((valueToken) {
+            if(valueToken !=null){
+              //navigate to home screen
+              Navigator.of(context).pushNamed(PageRouteName.main);
+            }else {
+              //navigate to login screen
+              Navigator.of(context).pushNamed(PageRouteName.login);
+            }
+          });
+        }else {
+          //navigate to language screen
 
-      Navigator.of(context).pushNamed(PageRouteName.login);
-/*     Navigator.of(context).push(MaterialPageRoute(builder: (context) => BottomBar(views: [
-       ChangeNotifierProvider(create: (context) => HomeViewModel(),child: Home(),),
-       Container(),
-       Container(),
-       Container(),
-     ]),));*/
+          //for testing we only navigate to home screen
+          Navigator.of(context).pushNamed(PageRouteName.login);
+        }
+      });
     });
     super.init();
   }
 }
-
-/*
-import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soul_fit/models/client.dart';
-import 'package:soul_fit/pages/splashScreen/splash_screen_service.dart';
-
-class SplashScreenViewModel extends ChangeNotifier {
-  SplashScreenService _splashScreenService = SplashScreenService();
-  Client? user;
-  String? token;
-  Future<bool> getProfile() {
-    return Future.value(true);
-  }
-
-  Future<String?> authenticate() {
-    return getLangState();
-  }
-
-  void initializeInterceptors() {
-    _splashScreenService.initializeInterceptors();
-  }
-
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-
-  Future<String?> getLangState() async {
-    final SharedPreferences prefs = await _prefs;
-
-    return prefs.getString("lang") ?? null;
-  }
-}
-*/

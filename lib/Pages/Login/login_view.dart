@@ -168,7 +168,8 @@ class _LoginView extends HookView<LoginViewModel> {
                           debugPrint('login bool value from login view model');
                           debugPrint(value.toString());
                           if(value){
-                            //navigate to home
+                            //navigate to main
+                            Navigator.of(context).pushNamed(PageRouteName.main);
                           }else {
                             //error in login request
                           }

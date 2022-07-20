@@ -17,4 +17,9 @@ class SignUpService {
       "dob": user.dob //"1999-08-17"
     });
   }
+  Future<bool> setTokens(String token,String refreshToken){
+    //there are tow tokens one initial and second when request return 401 in any request need token
+    _webService.setRefreshToken(refreshToken);
+    return _webService.setToken(token);
+  }
 }

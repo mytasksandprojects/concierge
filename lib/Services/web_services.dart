@@ -67,6 +67,12 @@ class WebService {
 
     return prefs.getString(storageRefreshKeyToken);
   }
+  Future<void> refreshTokens(){
+    return tokenDio.post('dj-rest-auth/token/refresh/').then((value) {
+      setRefreshToken('token');
+      setToken('token');
+    });
+  }
   /// ----------------------------------------------------------
   /// Method that saves the token in Shared Preferences
   /// ----------------------------------------------------------
@@ -85,16 +91,6 @@ class WebService {
     final SharedPreferences prefs = await _prefs;
 
     return prefs.setString(storageRefreshKeyToken, token);
-  }
-
-  /// ----------------------------------------------------------
-  /// initialize tokens
-  /// ----------------------------------------------------------
-
-  Future<void> initializeToken() async {
-    myToken = await getToken();
-    //initFCMToken();
-    return;
   }
 
   /*Future<void> initFCMToken() async {

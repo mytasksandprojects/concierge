@@ -5,7 +5,7 @@ class LoginService {
   final WebService _webService = WebService();
 
   Future<Response> login(String email, String password) {
-   return _webService.freeDio.post('dj-rest-auth/login/',data: {
+   return _webService.freeDio.post('http://206.189.239.57/dj-rest-auth/login/',data: {
     "email":email,
     "password":password
    });

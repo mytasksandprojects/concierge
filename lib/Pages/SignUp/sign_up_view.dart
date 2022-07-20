@@ -3,8 +3,11 @@ import 'package:concierge/Style/custom_icons.dart';
 import 'package:concierge/Widgets/rolling_date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:pmvvm/pmvvm.dart';
 
+import '../../Configuration/PageRouteName.dart';
+import '../../Configuration/validtor.dart';
 import 'sign_up_view_model.dart';
 
 class SignUp extends StatelessWidget {
@@ -70,6 +73,16 @@ class _SignUpView extends HookView<SignUpViewModel> {
                     height: 20,
                   ),
                   TextFormField(
+                    key: vmodel.namedKey,
+                    validator: (val) {
+                      if (val?.isNotEmpty ?? false) {
+                        return null;
+                      }
+                      return 'enter valid name';
+                    },
+                    onSaved: (val) {
+                      vmodel.email = val;
+                    },
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
@@ -90,6 +103,16 @@ class _SignUpView extends HookView<SignUpViewModel> {
                     height: 20,
                   ),
                   TextFormField(
+                    key: vmodel.emailKey,
+                    validator: (val) {
+                      if (AppValidator.isEmail(val)) {
+                        return null;
+                      }
+                      return 'enter valid email';
+                    },
+                    onSaved: (val) {
+                      vmodel.email = val;
+                    },
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
@@ -110,6 +133,16 @@ class _SignUpView extends HookView<SignUpViewModel> {
                     height: 20,
                   ),
                   TextFormField(
+                    key: vmodel.mobileKey,
+                    validator: (val) {
+                      if (val?.isNotEmpty ?? false) {
+                        return null;
+                      }
+                      return 'enter valid mobile';
+                    },
+                    onSaved: (val) {
+                      vmodel.mobile = val;
+                    },
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                       FilteringTextInputFormatter.digitsOnly
@@ -136,7 +169,24 @@ class _SignUpView extends HookView<SignUpViewModel> {
                     height: 20,
                   ),
                   TextFormField(
-                    obscureText: true,
+                    key: vmodel.password1Key,
+                    validator: (val) {
+                      if (val != null) {
+                        if (AppValidator.isPassword(val) &&
+                            AppValidator.isPassword(
+                                vmodel.password2) &&
+                            val.compareTo(vmodel.password2!) ==
+                                0) {
+                          return null;
+                        }
+                        return 'password must at least 8 characters and equals';
+                      }
+                      return 'password must at least 8 characters and equals';
+                    },
+                    onSaved: (val) {
+                      vmodel.password1 = val;
+                    },
+                    obscureText: vmodel.secureText,
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
@@ -148,7 +198,9 @@ class _SignUpView extends HookView<SignUpViewModel> {
                       hintStyle: TextStyle(color: Colors.grey),
                       suffixIcon: GestureDetector(
                           child: Icon(Icons.remove_red_eye, color: Colors.grey),
-                          onTap: () {}),
+                          onTap: () {
+                            vmodel.secureText = !vmodel.secureText;
+                          }),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey),
                       ),
@@ -161,7 +213,19 @@ class _SignUpView extends HookView<SignUpViewModel> {
                     height: 20,
                   ),
                   TextFormField(
-                    obscureText: true,
+                    onChanged: (val){
+                      vmodel.password2=val;
+                    },
+                    key: vmodel.password2Key,
+                    validator: (val) {
+                      return vmodel.password1Key.currentState!.validate()
+                          ? null
+                          : 'password must at least 8 characters and equals';
+                    },
+                    onSaved: (val) {
+                      vmodel.password2 = val;
+                    },
+                    obscureText: vmodel.secureText2,
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Icon(
@@ -173,7 +237,9 @@ class _SignUpView extends HookView<SignUpViewModel> {
                       hintStyle: TextStyle(color: Colors.grey),
                       suffixIcon: GestureDetector(
                           child: Icon(Icons.remove_red_eye, color: Colors.grey),
-                          onTap: () {}),
+                          onTap: () {
+                            vmodel.secureText2 = !vmodel.secureText2;
+                          }),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey),
                       ),
@@ -186,6 +252,16 @@ class _SignUpView extends HookView<SignUpViewModel> {
                     height: 20,
                   ),
                   TextFormField(
+                    key: vmodel.confirmationCodeKey,
+                    validator: (val) {
+                      if (val?.isNotEmpty ?? false) {
+                        return null;
+                      }
+                      return 'enter valid confirmation code';
+                    },
+                    onSaved: (val) {
+                      vmodel.confirmationCode = val;
+                    },
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       prefixIcon: Image.asset(
@@ -217,22 +293,51 @@ class _SignUpView extends HookView<SignUpViewModel> {
                   SizedBox(
                     height: 20,
                   ),
-                  Container(
-                      height: 60,
-                      width: MediaQuery.of(context).size.width / 1.2,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        gradient: CustomColors.mainGradient,
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Continue',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
+                  GestureDetector(
+                    onTap: () {
+                      if (vmodel.namedKey.currentState!.validate() &&
+                          vmodel.emailKey.currentState!.validate() &&
+                          vmodel.mobileKey.currentState!.validate() &&
+                          //vmodel.password1Key.currentState!.validate() &&
+                          vmodel.password2Key.currentState!.validate() &&
+                          vmodel.confirmationCodeKey.currentState!.validate()) {
+                        vmodel.namedKey.currentState!.save();
+                        vmodel.emailKey.currentState!.save();
+                        vmodel.mobileKey.currentState!.save();
+                        vmodel.password1Key.currentState!.save();
+                        vmodel.password2Key.currentState!.save();
+                        vmodel.confirmationCodeKey.currentState!.save();
+
+                        EasyLoading.show();
+                        vmodel.signUp().then((value) {
+                          debugPrint('login bool value from login view model');
+                          debugPrint(value.toString());
+                          if (value) {
+                            //navigate to main
+                            Navigator.of(context).pushNamed(PageRouteName.main);
+                          } else {
+                            //error in signup request
+                          }
+                        }).whenComplete(() => EasyLoading.dismiss());
+                      }
+                    },
+                    child: Container(
+                        height: 60,
+                        width: MediaQuery.of(context).size.width / 1.2,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: CustomColors.mainGradient,
                         ),
-                      )),
+                        child: Center(
+                          child: Text(
+                            'Continue',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        )),
+                  ),
                   SizedBox(
                     height: 30,
                   ),
