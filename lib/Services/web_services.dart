@@ -20,7 +20,7 @@ class WebService {
   static WebService? _this;
   final String _baseURL = "http://206.189.239.57/"; //production: not yet
   //stg:http://206.189.239.57/
-  final String _giftRayBaseURL="";
+  final String _giftRayBaseURL = "";
   late Dio freeDio;
   late Dio tokenDio;
   String storageKeyToken = "access_token";
@@ -62,17 +62,20 @@ class WebService {
 
     return prefs.getString(storageKeyToken);
   }
+
   Future<String?> getRefreshToken() async {
     final SharedPreferences prefs = await _prefs;
 
     return prefs.getString(storageRefreshKeyToken);
   }
-  Future<void> refreshTokens(){
+
+  Future<void> refreshTokens() {
     return tokenDio.post('dj-rest-auth/token/refresh/').then((value) {
       setRefreshToken('token');
       setToken('token');
     });
   }
+
   /// ----------------------------------------------------------
   /// Method that saves the token in Shared Preferences
   /// ----------------------------------------------------------
@@ -161,25 +164,41 @@ class WebService {
           debugPrint('statusCode: ${e.response?.statusCode}');
           debugPrint('data: ${e.response?.data}');
           EasyLoading.dismiss();
-
+          if (e.response?.statusCode == 401) {
+            tokenDio.lock();
+            tokenDio.interceptors.responseLock.lock();
+            tokenDio.interceptors.errorLock.lock();
+            freeDio.post("dj-rest-auth/token/refresh/", data: {
+              "refresh": refreshToken,
+            }).catchError((error) {
+              print(error);
+            }).whenComplete(() {
+              EasyLoading.show();
+              tokenDio.unlock();
+              tokenDio.interceptors.responseLock.unlock();
+              tokenDio.interceptors.errorLock.unlock();
+            }).then((value) async {
+              setToken(value.data[storageKeyToken]);
+              setRefreshToken(value.data[storageRefreshKeyToken]);
+              print("repeat after refresh");
+              handler.resolve(await tokenDio.request(
+                e.requestOptions.path,
+                data: e.requestOptions.data,
+                queryParameters: e.requestOptions.queryParameters,
+                options: Options(
+                  method: e.requestOptions.method,
+                  headers: e.requestOptions.headers,
+                ),
+              ));
+            });
+          }
           if (e.response != null) {
-            if (e.response!.statusCode == 401 ||
-                e.response!.statusCode == 403) {
-              if (e.requestOptions.path == "api/login")
-                ToastService.showErrorToast(e.response?.data['message']);
-              return handler.next(e);
-            } else if (e.requestOptions.path == "api/login") {
-              debugPrint("here");
-              return handler.next(e);
-            } else {
-              ToastService.showUnExpectedErrorToast();
               ToastService.showErrorToast(e.response!.data['non_field_errors']
                   .toString()
                   .replaceAll('[', ' ')
                   .replaceAll(']', ' ')
                   .replaceAll('{', ' ')
                   .replaceAll('}', ' '));
-            }
           } else {
             ToastService.showErrorToast(
               "no internet connection",
@@ -193,7 +212,7 @@ class WebService {
         onRequest: (options, handler) async {
           options.headers['Authorization'] = "Bearer " + myToken!;
           options.responseType = ResponseType.json;
-        //  options.headers.addAll({'locale': this.lang});
+          //  options.headers.addAll({'locale': this.lang});
           debugPrint('send request ${options.uri}');
           debugPrint('headers: ${options.headers}');
           debugPrint('query parameters: ${options.queryParameters}');

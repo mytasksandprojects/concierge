@@ -1,7 +1,6 @@
 import 'package:concierge/Configuration/PageRouteName.dart';
 import 'package:concierge/Pages/Home/home_view.dart';
 import 'package:concierge/Pages/splashScreen/splash_screen_service.dart';
-import 'package:concierge/Widgets/bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:pmvvm/pmvvm.dart';
 import 'package:easy_localization/easy_localization.dart';
