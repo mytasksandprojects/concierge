@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import '../../Services/web_services.dart';
 
 class SplashScreenService {
-  final WebService _webService = WebService();
+  final WebService _webService = WebService(); //call initializeInterceptors()
 
   void initializeInterceptors() {
     //initial dio

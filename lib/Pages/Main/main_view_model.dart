@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:concierge/Pages/Home/home_view.dart';
+import 'package:concierge/Pages/Home/home_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pmvvm/pmvvm.dart';
 
@@ -7,7 +8,7 @@ import '../../Style/custom_icons.dart';
 
 class MainViewModel extends ViewModel{
   List<Widget> views = [
-    Home(),
+    ChangeNotifierProvider(create: (context) => HomeViewModel(),child: Home()),
     Container(),
     Container(),
     Container(),//call profile screen that you created

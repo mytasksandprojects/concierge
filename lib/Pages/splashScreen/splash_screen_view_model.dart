@@ -24,7 +24,7 @@ class SplashScreenViewModel extends ViewModel {
           _splashScreenService.getToken().then((valueToken) {
             if(valueToken !=null){
               //navigate to home screen
-              Navigator.of(context).pushNamed(PageRouteName.main);
+              Navigator.of(context).pushNamed(PageRouteName.login);
             }else {
               //navigate to login screen
               Navigator.of(context).pushNamed(PageRouteName.login);
@@ -34,7 +34,7 @@ class SplashScreenViewModel extends ViewModel {
           //navigate to language screen
 
           //for testing we only navigate to home screen
-          Navigator.of(context).pushNamed(PageRouteName.login);
+          Navigator.of(context).pushNamed(PageRouteName.lang);
         }
       });
     });

@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, file_names
 
+import 'package:concierge/Pages/ChangeLang/change_lang_view.dart';
+import 'package:concierge/Pages/ChangeLang/change_lang_view_model.dart';
 import 'package:concierge/Pages/Home/home_view.dart';
 import 'package:concierge/Pages/Home/home_view_model.dart';
 import 'package:concierge/Pages/Login/login_view_model.dart';
@@ -70,6 +72,15 @@ class AppRouter {
               ChangeNotifierProvider(
                 create: (context) => MainViewModel(),
                 child: Main(),
+              ),
+        );
+      case PageRouteName.lang:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) =>
+              ChangeNotifierProvider(
+                create: (context) => ChangeLangViewModel(),
+                child: ChangeLang(),
               ),
         );
       default:

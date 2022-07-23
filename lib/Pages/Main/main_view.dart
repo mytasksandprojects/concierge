@@ -93,7 +93,7 @@ class _MainView extends HookView<MainViewModel> {
         centerTitle: true,
       ),
       extendBody: true,
-      backgroundColor: Color(0xff040405).withOpacity(0.11),
+      backgroundColor: Colors.black,//Color(0xff050505).withOpacity(0.11),
       body: vmodel.views[vmodel.bottomNavIndex],
       floatingActionButton: FloatingActionButton(
         //clipBehavior: Clip.none,

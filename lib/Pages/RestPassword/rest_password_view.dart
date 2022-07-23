@@ -1,11 +1,13 @@
 import 'package:concierge/Configuration/PageRouteName.dart';
+import 'package:concierge/Configuration/validtor.dart';
+import 'package:concierge/Services/toastService.dart';
 import 'package:concierge/Style/custom_colors.dart';
 import 'package:concierge/Style/custom_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:pmvvm/pmvvm.dart';
 
 import 'rest_password_view_model.dart';
-
 
 class RestPassword extends StatelessWidget {
   const RestPassword({Key? key}) : super(key: key);
@@ -70,6 +72,16 @@ class _LoginView extends HookView<RestPasswordViewModel> {
                     height: 20,
                   ),
                   TextFormField(
+                    style: TextStyle(color: Colors.black),
+                    key: vmodel.emailKey,
+                    onSaved: (newValue) => vmodel.email = newValue,
+                    controller: vmodel.emailController,
+                    validator: (val) {
+                      if (AppValidator.isEmail(val)) {
+                        return null;
+                      }
+                      return 'Enter valid email';
+                    },
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         Icons.person,
@@ -93,25 +105,42 @@ class _LoginView extends HookView<RestPasswordViewModel> {
             ),
           ),
           Center(
-            child: Container(
-                height: 60,
-                width: MediaQuery.of(context).size.width / 1.3,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: CustomColors.mainGradient,
-                ),
-                child: Center(
-                  child: Text(
-                    'RESET PASSWORD',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
+            child: GestureDetector(
+              onTap: () {
+                if (vmodel.emailKey.currentState!.validate()) {
+                  vmodel.emailKey.currentState!.save();
+                  EasyLoading.show();
+                  vmodel.resetPassword().then((value) {
+                    print(value);
+                    EasyLoading.dismiss();
+                    if (value) {
+                      ToastService.showSuccessToast(vmodel.message ?? '');
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          PageRouteName.login, (route) => false);
+                    }else ToastService.showErrorToast(vmodel.message ?? '');
+                  });
+                }
+              },
+              child: Container(
+                  height: 60,
+                  width: MediaQuery.of(context).size.width / 1.3,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: CustomColors.mainGradient,
                   ),
-                )),
+                  child: Center(
+                    child: Text(
+                      'RESET PASSWORD',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )),
+            ),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height/6,
+            height: MediaQuery.of(context).size.height / 6,
           ),
           Padding(
             padding: const EdgeInsets.all(15.0),
@@ -124,10 +153,16 @@ class _LoginView extends HookView<RestPasswordViewModel> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Already Have Account ? ',style: TextStyle(color: Colors.grey),),
-              GestureDetector(onTap: (){
-                Navigator.of(context).pushReplacementNamed(PageRouteName.login);
-              },child: Text('LOGIN')),
+              Text(
+                'Already Have Account ? ',
+                style: TextStyle(color: Colors.grey),
+              ),
+              GestureDetector(
+                  onTap: () {
+                    Navigator.of(context)
+                        .pushReplacementNamed(PageRouteName.login);
+                  },
+                  child: Text('LOGIN')),
             ],
           )
         ]));

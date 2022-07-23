@@ -1,4 +1,4 @@
-package com.concierge.concierge
+package com.infranile.concierge
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -59,13 +59,14 @@ class WebService {
 
   Future<String?> getToken() async {
     final SharedPreferences prefs = await _prefs;
-
+    myToken=prefs.getString(storageKeyToken);
+    getRefreshToken();
     return prefs.getString(storageKeyToken);
   }
 
   Future<String?> getRefreshToken() async {
     final SharedPreferences prefs = await _prefs;
-
+    refreshToken=prefs.getString(storageRefreshKeyToken);
     return prefs.getString(storageRefreshKeyToken);
   }
 
@@ -110,6 +111,7 @@ class WebService {
   initializeInterceptors() {
     tokenDio.interceptors.clear();
     freeDio.interceptors.clear();
+    //from postman headers section
     freeDio.options.headers = {
       "content-type": "application/json",
       "Accept": "*/*",
@@ -125,6 +127,7 @@ class WebService {
       "Content-Type": "application/json",
       //"Access-Control-Allow-Methods": "POST,GET, OPTIONS, DELETE, PUT",
     };
+    //from postman headers section
     tokenDio.options.headers = {
       "content-type": "application/json",
       "Accept": "*/*",
@@ -164,41 +167,16 @@ class WebService {
           debugPrint('statusCode: ${e.response?.statusCode}');
           debugPrint('data: ${e.response?.data}');
           EasyLoading.dismiss();
-          if (e.response?.statusCode == 401) {
-            tokenDio.lock();
-            tokenDio.interceptors.responseLock.lock();
-            tokenDio.interceptors.errorLock.lock();
-            freeDio.post("dj-rest-auth/token/refresh/", data: {
-              "refresh": refreshToken,
-            }).catchError((error) {
-              print(error);
-            }).whenComplete(() {
-              EasyLoading.show();
-              tokenDio.unlock();
-              tokenDio.interceptors.responseLock.unlock();
-              tokenDio.interceptors.errorLock.unlock();
-            }).then((value) async {
-              setToken(value.data[storageKeyToken]);
-              setRefreshToken(value.data[storageRefreshKeyToken]);
-              print("repeat after refresh");
-              handler.resolve(await tokenDio.request(
-                e.requestOptions.path,
-                data: e.requestOptions.data,
-                queryParameters: e.requestOptions.queryParameters,
-                options: Options(
-                  method: e.requestOptions.method,
-                  headers: e.requestOptions.headers,
-                ),
-              ));
-            });
-          }
+
           if (e.response != null) {
+            if(e.response!.data['non_field_errors']!=null)
               ToastService.showErrorToast(e.response!.data['non_field_errors']
                   .toString()
                   .replaceAll('[', ' ')
                   .replaceAll(']', ' ')
                   .replaceAll('{', ' ')
                   .replaceAll('}', ' '));
+            else ToastService.showUnExpectedErrorToast();
           } else {
             ToastService.showErrorToast(
               "no internet connection",
@@ -220,11 +198,13 @@ class WebService {
         },
         onResponse: (response, handler) async {
           await EasyLoading.dismiss();
+          //response returned done
           // Do something with response data
           debugPrint(response.data.toString());
           return handler.next(response); // continue
         },
         onError: (DioError e, handler) async {
+          //response returned error
           EasyLoading.dismiss();
           debugPrint('path: ${e.requestOptions.path}');
           debugPrint('response: ${e.response}');
@@ -235,7 +215,35 @@ class WebService {
             if (e.response!.statusCode == 401) {
               EasyLoading.dismiss();
               //refresh token api call
-              return handler.next(e);
+              //to refresh user token
+              if (e.response?.statusCode == 401) {
+                tokenDio.lock();
+                tokenDio.interceptors.responseLock.lock();
+                tokenDio.interceptors.errorLock.lock();
+                freeDio.post("dj-rest-auth/token/refresh/", data: {
+                  "refresh": refreshToken,
+                }).catchError((error) {
+                  print(error);
+                }).whenComplete(() {
+                  //EasyLoading.show();
+                  tokenDio.unlock();
+                  tokenDio.interceptors.responseLock.unlock();
+                  tokenDio.interceptors.errorLock.unlock();
+                }).then((value) async {
+                  setToken(value.data['access']);
+                //  setRefreshToken(value.data['access']);
+                  // print("repeat after refresh");
+                  handler.resolve(await tokenDio.request(
+                    e.requestOptions.path,
+                    data: e.requestOptions.data,
+                    queryParameters: e.requestOptions.queryParameters,
+                    options: Options(
+                      method: e.requestOptions.method,
+                      headers: e.requestOptions.headers,
+                    ),
+                  ));
+                });
+              }
             } else if (e.response!.statusCode == 413) {
               EasyLoading.dismiss();
               ToastService.showErrorToast('Image size too large');
